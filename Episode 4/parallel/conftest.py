@@ -23,6 +23,10 @@ def pytest_addoption(parser):
                      dest='drivers',
                      metavar='DRIVER',
                      help='driver to run tests against ()')
+    parser.addoption("--os",
+                     action="store",
+                     dest="os",
+                     help="OS to test against")
     parser.addoption("--os-version",
                      action='store',
                      dest="os_version",
@@ -86,6 +90,7 @@ def driver():
 @pytest.fixture(scope="function")
 def remote(request):
     browser = request.config.getoption('drivers')
+    _os = request.config.getoption("os")
     os_version = request.config.getoption('os_version')
     desired_cap = {
         "build": "parallel",
@@ -107,6 +112,10 @@ def remote(request):
 
     if os_version:
         desired_cap["os"] = "Windows"
+        desired_cap["os_version"] = os_version
+
+    if _os:
+        desired_cap["os"] = _os
         desired_cap["os_version"] = os_version
 
     bs_username = os.environ['BSUSERNAME']
